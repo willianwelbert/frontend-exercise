@@ -267,5 +267,44 @@ describe("App", () => {
       userEvent.type(input, "five hundred and five");
       screen.getByText("Output: 505");
     });
+
+    test("larger numbers", () => {
+      render(<App />);
+
+      const input = screen.getByRole("textbox", {
+        name: "Number ↔️ Name converter",
+      });
+
+      userEvent.type(input, "nine thousand nine hundred and ninety nine");
+      screen.getByText("Output: 9999");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "one hundred thousand");
+      screen.getByText("Output: 100000");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "one million");
+      screen.getByText("Output: 1000000");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "ten million");
+      screen.getByText("Output: 10000000");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "one hundred million");
+      screen.getByText("Output: 100000000");
+
+      userEvent.clear(input);
+
+      userEvent.type(
+        input,
+        "nine hundred and ninety nine million nine hundred and ninety nine thousand nine hundred and ninety nine"
+      );
+      screen.getByText("Output: 999999999");
+    });
   });
 });

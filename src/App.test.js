@@ -166,4 +166,106 @@ describe("App", () => {
       );
     });
   });
+
+  describe("convertion: in full name to number", () => {
+    test("not a number in full", () => {
+      render(<App />);
+
+      const input = screen.getByRole("textbox", {
+        name: "Number ↔️ Name converter",
+      });
+
+      userEvent.type(input, "apple");
+      screen.getByText("Output: Sorry, we could not find that number");
+    });
+
+    test("zero is always zero", () => {
+      render(<App />);
+
+      const input = screen.getByRole("textbox", {
+        name: "Number ↔️ Name converter",
+      });
+
+      userEvent.type(input, "zero zero");
+      screen.getByText("Output: 0");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "one hundred and zero");
+      screen.getByText("Output: 100");
+    });
+
+    test("one digit", () => {
+      render(<App />);
+
+      const input = screen.getByRole("textbox", {
+        name: "Number ↔️ Name converter",
+      });
+
+      userEvent.type(input, "one");
+      screen.getByText("Output: 1");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "zero");
+      screen.getByText("Output: 0");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "nine");
+      screen.getByText("Output: 9");
+    });
+
+    test("two digits", () => {
+      render(<App />);
+
+      const input = screen.getByRole("textbox", {
+        name: "Number ↔️ Name converter",
+      });
+
+      userEvent.type(input, "ten");
+      screen.getByText("Output: 10");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "fifteen");
+      screen.getByText("Output: 15");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "thirty");
+      screen.getByText("Output: 30");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "ninety nine");
+      screen.getByText("Output: 99");
+    });
+
+    test("three digits", () => {
+      render(<App />);
+
+      const input = screen.getByRole("textbox", {
+        name: "Number ↔️ Name converter",
+      });
+
+      userEvent.type(input, "one hundred");
+      screen.getByText("Output: 100");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "one hundred and fifty");
+      screen.getByText("Output: 150");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "nine hundred and ninety nine");
+      screen.getByText("Output: 999");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "five hundred and five");
+      screen.getByText("Output: 505");
+    });
+  });
 });

@@ -33,14 +33,23 @@ const tens = {
 };
 
 const hundredsAndAbove = {
-  3: "hundred",
-  4: "thousand",
-  7: "million",
+  100: "hundred",
+  1000: "thousand",
+  1000000: "million",
 };
 
 const dictionary = {
   ...ones,
   ...tens,
+  ...hundredsAndAbove,
 };
 
-export { dictionary, ones, tens, hundredsAndAbove };
+const invertedDictionary = () => {
+  const inverted = {};
+  for (const key in dictionary) {
+    inverted[dictionary[key]] = key;
+  }
+  return inverted;
+};
+
+export { dictionary, ones, tens, hundredsAndAbove, invertedDictionary };

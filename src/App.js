@@ -1,68 +1,128 @@
 import React, { useState } from "react";
 
 import validation from "./validation";
-import { tens, ones } from "./numberToName";
+import threeDigitConverter from "./threeDigitConverter";
+import { invertedDictionary } from "./dictionary";
 
 function App() {
   const [error, setError] = useState("");
   const [output, setOutput] = useState("");
 
-  const inFullToNumber = () => {
-    setOutput("someday this will be a number");
+  const inFullToNumber = (input) => {
+    const dividedInput = input.split(" ");
+    const inputSize = dividedInput.length;
+    const dictionary = invertedDictionary();
+
+    //
+    //token array positions are 'million', 'thousand', 'hundred'
+    //those can help me identify output size
+    //
+
+    //from the top:
+    //zero always returns 0
+
+    const oneWord = (input) => {
+      return dictionary[input]
+        ? dictionary[input]
+        : "Sorry, we could not find that number";
+    };
+
+    const twoWords = (input) => {
+      const reducer = (acc, current) => {
+        const key = dictionary[current] || 0;
+        const numericKey = Number(key);
+        return key.length > 2 ? acc * numericKey : acc + numericKey;
+      };
+      return input.reduce(reducer, 0);
+    };
+
+    // const threeWords = (input) => {
+    //   const numbersOnly = input.filter((entry) => entry !== "and");
+
+    //   const reducer = (acc, current) => {
+    //     const key = dictionary[current] || 0;
+    //     const numericKey = Number(key);
+    //     return key.length > 2 ? acc * numericKey : acc + numericKey;
+    //   };
+    //   return numbersOnly.reduce(reducer, 0);
+    // };
+
+    switch (inputSize) {
+      case 1:
+        return setOutput(oneWord(dividedInput));
+      case 2:
+        return setOutput(twoWords(dividedInput));
+      case 3:
+        return setOutput(twoWords(dividedInput));
+      default:
+        return setOutput(twoWords(dividedInput));
+    }
+
+    //three words is where we start to get dirty
+    // one hundred and twenty two
+    // 'one hundred' could be read as 1 input, 'and' is ignored (filter?)
+    //so grabing 'hundred' and then index -1 should give me a searchable number
+    //that number * 100
+    // 1 * 100 + 20 + 2 => 100 + 20 + 2 => 122
+
+    //from the logic above is just a matter of token vs multiplication factor
+    // [1] * 1000 = thousand
+    // [1] * 100000 = million
+    // where [1] is number before token (index -1)
+    // and token is a dictionary item
+    // 9 * thousand + 20 + 2
+    // 9 * 1000 + 20 + 2
+    // 9000 + 20 +2
+    // 9022
+    // nine thousand twenty two
   };
 
   const numberToInFull = (input) => {
     const inputSize = input.length;
 
-    // 1 million 100 thousand 5 hundred and 50
-    // convertion should be done 3 by 3
-    // > 3 appends 'thousand' to the string
-    // > 6 appends 'million' to the string
+    if (inputSize > 3) {
+      const mutableInput = [...input];
 
-    const onesPosition = (input) => {
-      return ones[input];
-    };
+      const convertableInputs = [];
 
-    const tensPosition = (input) => {
-      if (input[0] === "0") return `${onesPosition(input[1])}`;
+      for (let i = 0; mutableInput.length > 0; i++) {
+        const thirdIndexFromEnd = mutableInput.length - 3;
+        const startIndex = thirdIndexFromEnd > 0 ? thirdIndexFromEnd : 0;
+        const threeDigitInput = mutableInput.splice(startIndex, 3);
+        convertableInputs.push(threeDigitInput);
+      }
 
-      return tens[input]
-        ? tens[input]
-        : `${tens[input[0] * 10]} ${onesPosition(input[1])}`;
-    };
+      const result = convertableInputs.map((inputArray) =>
+        threeDigitConverter(inputArray)
+      );
 
-    const hundredsPosition = (input) => {
-      const tensInHundred = tensPosition([input[1], input[2]].join(""));
-      const shouldIgnoreTens = tensInHundred === "zero";
-      return shouldIgnoreTens
-        ? `${onesPosition(input[0])} hundred`
-        : `${onesPosition(input[0])} hundred and ${tensInHundred}`;
-    };
+      const filteredResult = result.filter((value) => value !== undefined);
 
-    switch (inputSize) {
-      case 1:
-        return setOutput(onesPosition(input));
-      case 2:
-        return setOutput(tensPosition(input));
-      case 3:
-        return setOutput(hundredsPosition(input));
-      case 4:
-      case 5:
-      case 6:
-        return setOutput("thousand");
-      case 7:
-      case 8:
-      case 9:
-        return setOutput("million");
-      default:
-        return setOutput("");
+      const term = result.length > 2 ? "million" : "thousand";
+
+      switch (filteredResult.length) {
+        case 1:
+          return setOutput(`${filteredResult[0]} ${term}`);
+        case 2:
+          return setOutput(
+            `${filteredResult[1]} thousand ${filteredResult[0]}`
+          );
+        case 3:
+          return setOutput(
+            `${filteredResult[2]} million ${filteredResult[1]} thousand ${filteredResult[0]}`
+          );
+        default:
+          return setOutput("");
+      }
     }
+
+    return setOutput(threeDigitConverter(input));
   };
 
   const handleChange = (evt) => {
     setError("");
     const input = evt.target.value;
-    !isNaN(input) ? numberToInFull(input) : inFullToNumber(input);
+    isNaN(input) ? inFullToNumber(input) : numberToInFull(input);
     validation(input, setError);
   };
 

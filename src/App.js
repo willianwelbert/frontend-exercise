@@ -1,78 +1,26 @@
 import React, { useState } from "react";
 
 import validation from "./validation";
-import threeDigitConverter from "./threeDigitConverter";
-import { invertedDictionary } from "./dictionary";
+
+import digitConverter from "./digitConverter";
+import largeNumbersConverter from "./largeNumbersConverter";
+
+import stringConverter from "./stringConverter";
 
 function App() {
   const [error, setError] = useState("");
   const [output, setOutput] = useState("");
 
   const inFullToNumber = (input) => {
-    const dividedInput = input.split(" ");
-    const inputSize = dividedInput.length;
-    const dictionary = invertedDictionary();
-
-    const oneWord = (input) => {
-      return dictionary[input]
-        ? dictionary[input]
-        : "Sorry, we could not find that number";
-    };
-
-    const multipleWords = (input) => {
-      const reducer = (acc, current) => {
-        const key = dictionary[current] || 0;
-        const numericKey = Number(key);
-        return key.length > 2 ? acc * numericKey : acc + numericKey;
-      };
-      return input.reduce(reducer, 0);
-    };
-
-    inputSize > 1
-      ? setOutput(multipleWords(dividedInput))
-      : setOutput(oneWord(dividedInput));
+    setOutput(stringConverter(input));
   };
 
   const numberToInFull = (input) => {
     const inputSize = input.length;
 
-    if (inputSize > 3) {
-      const mutableInput = [...input];
-
-      const convertableInputs = [];
-
-      for (let i = 0; mutableInput.length > 0; i++) {
-        const thirdIndexFromEnd = mutableInput.length - 3;
-        const startIndex = thirdIndexFromEnd > 0 ? thirdIndexFromEnd : 0;
-        const threeDigitInput = mutableInput.splice(startIndex, 3);
-        convertableInputs.push(threeDigitInput);
-      }
-
-      const result = convertableInputs.map((inputArray) =>
-        threeDigitConverter(inputArray)
-      );
-
-      const filteredResult = result.filter((value) => value !== undefined);
-
-      const term = result.length > 2 ? "million" : "thousand";
-
-      switch (filteredResult.length) {
-        case 1:
-          return setOutput(`${filteredResult[0]} ${term}`);
-        case 2:
-          return setOutput(
-            `${filteredResult[1]} thousand ${filteredResult[0]}`
-          );
-        case 3:
-          return setOutput(
-            `${filteredResult[2]} million ${filteredResult[1]} thousand ${filteredResult[0]}`
-          );
-        default:
-          return setOutput("");
-      }
-    }
-
-    return setOutput(threeDigitConverter(input));
+    return inputSize > 3
+      ? setOutput(largeNumbersConverter(input))
+      : setOutput(digitConverter(input));
   };
 
   const handleChange = (evt) => {

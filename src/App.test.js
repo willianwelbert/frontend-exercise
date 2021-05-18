@@ -53,6 +53,47 @@ describe("App", () => {
   });
 
   describe("convertion: number to in full name", () => {
+    test("zero is always zero", () => {
+      render(<App />);
+
+      const input = screen.getByRole("textbox", {
+        name: "Number ↔️ Name converter",
+      });
+
+      userEvent.type(input, "000");
+      screen.getByText("Output: zero");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "0000");
+      screen.getByText("Output: zero");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "0000000");
+      screen.getByText("Output: zero");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "100000000");
+      screen.getByText("Output: one hundred million");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "000000001");
+      screen.getByText("Output: one");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "000000010");
+      screen.getByText("Output: ten");
+
+      userEvent.clear(input);
+
+      userEvent.type(input, "000000100");
+      screen.getByText("Output: one hundred");
+    });
+
     test("one digit", () => {
       render(<App />);
 

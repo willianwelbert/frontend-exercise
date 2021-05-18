@@ -19,9 +19,16 @@ const threeDigitConverter = (input) => {
   };
 
   const hundredsPosition = (input) => {
-    if ([...input].every((value) => value === "0")) return;
     const tensInHundred = tensPosition([input[1], input[2]].join(""));
     const shouldIgnoreTens = tensInHundred === "zero";
+
+    if ([...input].every((value) => value === "0")) {
+      return onesPosition(0);
+    }
+    if (input[0] === "0" && input[1] === "0") return onesPosition(input[2]);
+
+    if (input[0] === "0" && input[1] !== "0") return tensInHundred;
+
     return shouldIgnoreTens
       ? `${onesPosition(input[0])} hundred`
       : `${onesPosition(input[0])} hundred and ${tensInHundred}`;

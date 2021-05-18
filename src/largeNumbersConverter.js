@@ -16,9 +16,15 @@ const largeNumbersConverter = (input) => {
     digitConverter(inputArray)
   );
 
-  const filteredResult = result.filter((value) => value !== undefined);
+  const filteredResult = result.filter(
+    (value) => value !== undefined && value !== "zero"
+  );
 
   const term = result.length > 2 ? "million" : "thousand";
+
+  if (filteredResult.every((value) => value === "zero")) return "zero";
+
+  if (result[0] !== "zero" && result[1] === "zero") return result[0];
 
   switch (filteredResult.length) {
     case 1:
